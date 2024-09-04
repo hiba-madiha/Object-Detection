@@ -17,13 +17,17 @@ def process_class_list(classes_string: str):
 def model_inference(img, model_name: str, prob_threshold: int, classes_to_show = str):
     feature_extractor = AutoFeatureExtractor.from_pretrained(f"hustvl/{model_name}")
     model = YolosForObjectDetection.from_pretrained(f"hustvl/{model_name}")
+    device='cuda' if torch.cuda.is_available() else 'cpu'
+    model.to(device)
+    model.eval()
 
     img = Image.fromarray(img)
 
     pixel_values = feature_extractor(img, return_tensors="pt").pixel_values
+    pixel_values.to(device)
 
     with torch.no_grad():
-        outputs = model(pixel_values, output_attentions=True)
+        outputs = model(pixel_values.to(device), output_attentions=True)
 
     probas = outputs.logits.softmax(-1)[0, :, :-1]
     keep = probas.max(-1).values > prob_threshold
@@ -33,6 +37,7 @@ def model_inference(img, model_name: str, prob_threshold: int, classes_to_show =
     bboxes_scaled = postprocessed_outputs[0]['boxes']
 
     classes_list = process_class_list(classes_to_show)
+
     return plot_results(
         img, probas[keep], bboxes_scaled[keep], model, classes_list
     )
@@ -56,6 +61,7 @@ def plot_results(pil_img, prob, boxes, model, classes_list):
         ax.text(xmin, ymin, text, fontsize=15,
                 bbox=dict(facecolor='yellow', alpha=0.5))
     plt.axis('off')
+    del model
     return fig2img(plt.gcf())
     
 def fig2img(fig):
