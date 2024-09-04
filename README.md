@@ -21,7 +21,7 @@ Object detection is a computer vision technique that identifies and classifies a
 ## Installation
 - To run this project, you need to install some dependencies:
 
-     - `Python 3`
+     - `Python 3 (3.7+ & <=3.11)`
      - `PyTorch`
     - ` Transformers`
     -  `Gradio`
@@ -35,7 +35,7 @@ Object detection is a computer vision technique that identifies and classifies a
 ---
 ## Usage
 - To run this project, you need to execute the app.py script:
-      `python main.py`
+      `python app.py`
 
 ---
 ## Examples
